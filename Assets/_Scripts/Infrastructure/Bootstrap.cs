@@ -11,6 +11,11 @@ namespace MonsterCouchTest.Infrastructure
     {
         private static bool _initialized = false;
 
+        [SerializeField]
+        private Camera _camera;
+        [SerializeField, Min(0.0f)]
+        private float _boundsMargin = 0.0f;
+
         private void Awake()
         {
             if (_initialized)
@@ -33,6 +38,11 @@ namespace MonsterCouchTest.Infrastructure
 
         private void InitSystems()
         {
+            if (_camera == null)
+            {
+                _camera = Camera.main;
+            }
+
             var registry = new ServiceRegistry().AddGameSystems();
 
             ServiceLocator.Current = registry.Build();
