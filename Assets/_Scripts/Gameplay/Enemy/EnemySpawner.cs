@@ -13,6 +13,8 @@ namespace MonsterCouchTest.Gameplay.Enemy
         private ObjectPool<Enemy> _pool;
         private readonly List<Enemy> _active = new();
 
+        private bool _isPlaying;
+
         [Header("Setup")]
         [SerializeField] private Enemy _enemyPrefab;
         [SerializeField, Min(1)] private int _initialCount = 1000;
@@ -44,13 +46,20 @@ namespace MonsterCouchTest.Gameplay.Enemy
             _pool = new ObjectPool<Enemy>(_enemyPrefab, prewarm: _initialCount, parent: _poolParent);
         }
 
-        private void Start()
+        private void OnDisable()
         {
-            BeginPlay();
+            EndPlay();
         }
 
         public void BeginPlay()
         {
+            if (_isPlaying)
+            {
+                return;
+            }
+
+            _isPlaying = true;
+
             var rect = _bounds != null ? _bounds.GetWorldRect() : new Rect(-8, -5, 16, 10);
 
             for (int i = 0; i < _initialCount; i++)
@@ -84,11 +93,18 @@ namespace MonsterCouchTest.Gameplay.Enemy
 
         public void EndPlay()
         {
+            if (!_isPlaying)
+            {
+                return;
+            }
+
             for (int i = _active.Count - 1; i >= 0; i--)
             {
                 _pool.Release(_active[i]);
             }
             _active.Clear();
+
+            _isPlaying = false;
         }
 
         private static Vector3 RandomPointInRect(Rect r, float margin)
