@@ -33,12 +33,30 @@ namespace MonsterCouchTest.Infrastructure
 
         private void InitSystems()
         {
+            var registry = new ServiceRegistry().AddGameSystems();
 
+            ServiceLocator.Current = registry.Build();
+
+            InjectHierarchy();
         }
 
         private void Shutdown()
         {
+            (ServiceLocator.Current as System.IDisposable)?.Dispose();
+        }
 
+        private void InjectHierarchy()
+        {
+            var resolver = ServiceLocator.Current;
+            var roots = gameObject.scene.GetRootGameObjects();
+            foreach (var go in roots)
+            {
+                var all = go.GetComponentsInChildren<MonoBehaviour>(true);
+                foreach (var mb in all)
+                {
+                    Injector.InjectInto(mb, resolver);
+                }
+            }
         }
     }
 }
