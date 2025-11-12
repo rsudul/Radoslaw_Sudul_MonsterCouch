@@ -43,7 +43,7 @@ namespace MonsterCouchTest.Infrastructure
                 _camera = Camera.main;
             }
 
-            var registry = new ServiceRegistry().AddGameSystems();
+            var registry = new ServiceRegistry().AddGameSystems(_camera, _boundsMargin);
 
             ServiceLocator.Current = registry.Build();
 
